@@ -1,7 +1,7 @@
-import { Avatar, Text, VStack } from "native-base";
+import { Avatar, ITextProps, Text, VStack } from "native-base";
 import { MyButton } from "./Button";
 
-interface CardProps {
+interface CardProps extends ITextProps {
   name: string;
   avatar: string;
   specialty: string;
@@ -17,6 +17,7 @@ export function CardConsultation({
   date,
   wasAttended,
   wasScheduled,
+  ...rest
 }: CardProps) {
   return (
     <VStack
@@ -26,6 +27,7 @@ export function CardConsultation({
       borderRadius="lg"
       shadow="2"
       my={2}
+      {...rest}
     >
       <VStack flex="1" flexDir="row">
         <Avatar
