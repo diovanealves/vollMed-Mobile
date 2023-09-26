@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
 import Tabs from "./Tabs";
+import Scheduling from "../screens/Scheduling";
 
 const Tab = createNativeStackNavigator();
 
@@ -24,6 +25,11 @@ export default function Routes() {
         <Tab.Screen
           name="Tabs"
           component={Tabs}
+          options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Scheduling"
+          component={Scheduling}
           options={{ headerShown: false }}
         />
       </Tab.Navigator>

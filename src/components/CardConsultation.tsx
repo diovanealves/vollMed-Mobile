@@ -8,6 +8,7 @@ interface CardProps extends ITextProps {
   date?: string;
   wasAttended?: boolean;
   wasScheduled?: boolean;
+  onPress?: () => void;
 }
 
 export function CardConsultation({
@@ -17,6 +18,7 @@ export function CardConsultation({
   date,
   wasAttended,
   wasScheduled,
+  onPress,
   ...rest
 }: CardProps) {
   return (
@@ -45,7 +47,7 @@ export function CardConsultation({
         </VStack>
       </VStack>
 
-      <MyButton mt={3}>
+      <MyButton mt={3} onPress={onPress}>
         {wasScheduled ? "Cancelar" : "Agendar consulta"}
       </MyButton>
     </VStack>

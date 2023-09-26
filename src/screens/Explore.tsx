@@ -1,33 +1,61 @@
 import { Box, ScrollView, VStack } from "native-base";
+import { useState } from "react";
 import { MyInput } from "../components/Input";
 import { MyButton } from "../components/Button";
 import { Title } from "../components/Title";
 import { CardConsultation } from "../components/CardConsultation";
-import { MockExplore } from "../utils/MockExplore";
+import { getSpecialist } from "../services/SpecialistService";
+import { Specialty } from "../interface/Specialty";
+import { NavigationProps } from "../@types/navigation";
 
-export default function Explore() {
+export default function Explore({ navigation }: NavigationProps<"Explore">) {
+  const [state, setState] = useState("");
+  const [specialty, setSpecialty] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
+
+  async function search() {
+    if (!state || !specialty) {
+      return null;
+    }
+
+    const response = await getSpecialist(state, specialty);
+    if (response) {
+      setSearchResult(response);
+    }
+  }
+
   return (
     <ScrollView flex={1} bg="white">
       <VStack p="5">
         <Box w="100%" borderRadius="lg" p={3} shadow="1" borderRightRadius="md">
-          <MyInput placeholder="Digite sua especialidade" />
-          <MyInput placeholder="Digite sua localização" />
-          <MyButton mt={6}>Buscar</MyButton>
+          <MyInput
+            placeholder="Digite sua especialidade"
+            value={specialty}
+            onChangeText={setSpecialty}
+          />
+          <MyInput
+            placeholder="Digite sua localização"
+            value={state}
+            onChangeText={setState}
+          />
+          <MyButton onPress={search} mt={6}>
+            Buscar
+          </MyButton>
         </Box>
 
         <Title color="blue.500" fontWeight="bold" mb={5}>
           Resultados da busca
         </Title>
 
-        {MockExplore.filter(
-          (consultation) => consultation.wasAttended === true
-        ).map((consultation) => (
+        {searchResult?.map((specialty: Specialty) => (
           <CardConsultation
-            key={consultation.id}
-            name={consultation.name}
-            avatar={consultation.avatar}
-            specialty={consultation.specialty}
-            wasAttended
+            key={specialty.id}
+            name={specialty.nome}
+            avatar={specialty.imagem}
+            specialty={specialty.especialidade}
+            onPress={() =>
+              navigation.navigate("Scheduling", { spealistId: specialty.id })
+            }
             flex={1}
             alignItems="center"
             bg="white"

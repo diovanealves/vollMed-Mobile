@@ -4,12 +4,16 @@ interface InputTextProps {
   label?: string;
   placeholder: string;
   secureTextEntry?: boolean;
+  value?: string;
+  onChangeText?: (value: string) => void;
 }
 
 export function MyInput({
   label,
   placeholder,
   secureTextEntry,
+  value,
+  onChangeText,
 }: InputTextProps) {
   return (
     <FormControl mt={3}>
@@ -22,6 +26,8 @@ export function MyInput({
         backgroundColor="gray.100"
         secureTextEntry={secureTextEntry}
         shadow={3}
+        value={value}
+        onChangeText={onChangeText}
       />
     </FormControl>
   );

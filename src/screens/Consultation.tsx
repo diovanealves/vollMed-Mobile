@@ -1,31 +1,90 @@
-import { Divider, ScrollView, VStack } from "native-base";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Divider, ScrollView, VStack, useToast } from "native-base";
+import { useIsFocused } from "@react-navigation/native";
+import { useState, useEffect } from "react";
+
 import { CardConsultation } from "../components/CardConsultation";
 import { Title } from "../components/Title";
 import { MyButton } from "../components/Button";
-import { MockConsultation } from "../utils/MockConsultation";
+import { Consultations } from "../interface/Consultation";
+import { getConsultationPatient } from "../services/PatientService";
+import { cancelAppointment } from "../services/ConsultationService";
+import { DateToStringConverter } from "../utils/StringToData";
+import { NavigationProps } from "../@types/navigation";
 
-export default function Consultation() {
+export default function Consultation({
+  navigation,
+}: NavigationProps<"Consultation">) {
+  const [nextConsultation, setNextConsultation] = useState<Consultations[]>([]);
+  const [pastConsultation, setPastConsultation] = useState<Consultations[]>([]);
+  const [loading, setloading] = useState(false);
+  const toast = useToast();
+  const isFocused = useIsFocused;
+
+  useEffect(() => {
+    async function getConsultation() {
+      const patientId = await AsyncStorage.getItem("patientId");
+      if (!patientId) {
+        return;
+      }
+
+      const allConsultation: Consultations[] = await getConsultationPatient(
+        patientId
+      );
+      const now = new Date();
+
+      const next = allConsultation.filter(
+        (consultation) => new Date(consultation.data) > now
+      );
+
+      const past = allConsultation.filter(
+        (consultation) => new Date(consultation.data) <= now
+      );
+
+      setNextConsultation(next);
+      setPastConsultation(past);
+    }
+    getConsultation();
+  }, [isFocused, loading, nextConsultation]);
+
+  async function cancel(consultationId: string) {
+    const response = await cancelAppointment(consultationId);
+    if (response) {
+      toast.show({
+        title: "Agendamento cancelado com sucesso",
+        backgroundColor: "green.500",
+      });
+      setloading(!loading);
+    } else {
+      toast.show({
+        title: "Erro ao cancelar consulta",
+        backgroundColor: "red.500",
+      });
+    }
+  }
+
   return (
     <ScrollView>
       <VStack p={4}>
         <Title color="blue.500" mt={4}>
           Minhas consultas
         </Title>
-        <MyButton mt={5}>Agendar nova consulta</MyButton>
+        <MyButton onPress={() => navigation.navigate("Explore")} mt={5}>
+          Agendar nova consulta
+        </MyButton>
 
         <Title color="blue.500" fontSize="lg" alignSelf="flex-start" mb={2}>
           Próximas consulta
         </Title>
 
-        {MockConsultation.filter(
-          (consultation) => consultation.wasScheduled === true
-        ).map((consultation) => (
+        {nextConsultation?.map((consultation) => (
           <CardConsultation
-            key={consultation.id}
-            name={consultation.name}
-            avatar={consultation.avatar}
-            specialty={consultation.specialty}
-            date={consultation.date}
+            key={consultation?.id}
+            name={consultation?.especialista?.nome}
+            avatar={consultation?.especialista?.imagem}
+            specialty={consultation?.especialista?.especialidade}
+            date={DateToStringConverter(consultation?.data)}
+            onPress={() => cancel(consultation?.id)}
             wasScheduled
           />
         ))}
@@ -36,15 +95,13 @@ export default function Consultation() {
           Consultas passadas
         </Title>
 
-        {MockConsultation.filter(
-          (consultation) => consultation.wasAttended === true
-        ).map((consultation) => (
+        {pastConsultation.map((consultation) => (
           <CardConsultation
-            key={consultation.id}
-            name={consultation.name}
-            avatar={consultation.avatar}
-            specialty={consultation.specialty}
-            date={consultation.date}
+            key={consultation?.id}
+            name={consultation?.especialista?.nome}
+            avatar={consultation?.especialista?.imagem}
+            specialty={consultation?.especialista?.especialidade}
+            date={DateToStringConverter(consultation?.data)}
             wasAttended
           />
         ))}
