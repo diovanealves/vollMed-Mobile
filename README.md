@@ -6,8 +6,8 @@
 | --------------------- | ---------------------------------------------------------------------------- |
 | :sparkles: Nome       | **VollMed Mobile**                                                           |
 | :label: Tecnologias   | React-Native, React-Navigation, Native-Base, AsyncStorage, JWT-Decode, Axios |
-| :rocket: URL          | ##############################################                               |
-| :fire: Repositorio    | https://github.com/diovanealves/DevMeet                                       |
+| :rocket: URL          | https://github.com/diovanealves/vollMed-Mobile                               |
+| :fire: Repositorio     | https://github.com/diovanealves/vollMed-Mobile                               |
 
 ![](./assets/preview.jpg#vitrinedev)
 
